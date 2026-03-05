@@ -1,0 +1,52 @@
+name: Notify Failure
+
+on:
+  workflow_call:
+    inputs:
+      project:
+        description: 'Project name for the issue title'
+        required: true
+        type: string
+    secrets:
+      CC_PAT:
+        description: 'PAT with issues:write on command-center repo'
+        required: true
+      DISCORD_WEBHOOK:
+        description: 'Discord webhook URL for notifications'
+        required: false
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create issue in command-center
+        env:
+          GH_TOKEN: ${{ secrets.CC_PAT }}
+        run: |
+          gh issue create \
+            --repo LibruaryNFT/command-center \
+            --title "[CI-FAIL] ${{ inputs.project }} — ${{ github.workflow }} failed" \
+            --label "ci-failure" \
+            --body "$(cat <<BODY
+          ## CI Failure
+
+          | Field | Value |
+          |-------|-------|
+          | **Project** | ${{ inputs.project }} |
+          | **Workflow** | ${{ github.workflow }} |
+          | **Branch** | ${{ github.ref_name }} |
+          | **Commit** | \`${{ github.sha }}\` |
+          | **Actor** | ${{ github.actor }} |
+          | **Run** | ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} |
+          | **Time** | $(date -u '+%Y-%m-%dT%H:%M:%SZ') |
+          BODY
+          )"
+
+      - name: Discord notification
+        if: ${{ secrets.DISCORD_WEBHOOK != '' }}
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          curl -s -H "Content-Type: application/json" \
+            -d "{\"content\": \"🔴 **CI Failed**: ${{ inputs.project }} — ${{ github.workflow }}\\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
+            "$WEBHOOK_URL"

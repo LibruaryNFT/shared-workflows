@@ -1,0 +1,36 @@
+name: Security Scan
+
+on:
+  workflow_call:
+    inputs:
+      scan-type:
+        description: 'Trivy scan type (fs, repo, image)'
+        required: false
+        type: string
+        default: 'fs'
+      severity:
+        description: 'Minimum severity to fail on'
+        required: false
+        type: string
+        default: 'CRITICAL,HIGH'
+      skip-dirs:
+        description: 'Directories to skip (comma-separated)'
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  trivy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: ${{ inputs.scan-type }}
+          scan-ref: '.'
+          severity: ${{ inputs.severity }}
+          exit-code: '1'
+          skip-dirs: ${{ inputs.skip-dirs }}
+          format: 'table'

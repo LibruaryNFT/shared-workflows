@@ -1,0 +1,40 @@
+name: Python CI
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        description: 'Python version to use'
+        required: false
+        type: string
+        default: '3.12'
+      test-command:
+        description: 'Test command to run'
+        required: false
+        type: string
+        default: 'python -m pytest tests/ -v'
+      requirements-file:
+        description: 'Requirements file path'
+        required: false
+        type: string
+        default: 'requirements.txt'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ${{ inputs.requirements-file }}
+
+      - name: Run tests
+        run: ${{ inputs.test-command }}
