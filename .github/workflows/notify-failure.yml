@@ -43,9 +43,9 @@ jobs:
           )"
 
       - name: Discord notification
-        if: ${{ secrets.DISCORD_WEBHOOK != '' }}
         env:
           WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
+        if: ${{ env.WEBHOOK_URL != '' }}
         run: |
           curl -s -H "Content-Type: application/json" \
             -d "{\"content\": \"🔴 **CI Failed**: ${{ inputs.project }} — ${{ github.workflow }}\\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
