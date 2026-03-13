@@ -10,7 +10,7 @@ on:
     secrets:
       CC_PAT:
         description: 'PAT with issues:write on command-center repo'
-        required: true
+        required: false
       DISCORD_WEBHOOK:
         description: 'Discord webhook URL for notifications'
         required: false
@@ -20,6 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create issue in command-center
+        if: ${{ secrets.CC_PAT != '' }}
         env:
           GH_TOKEN: ${{ secrets.CC_PAT }}
         run: |
