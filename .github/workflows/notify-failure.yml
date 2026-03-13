@@ -20,9 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create issue in command-center
-        if: ${{ secrets.CC_PAT != '' }}
         env:
           GH_TOKEN: ${{ secrets.CC_PAT }}
+        if: ${{ env.GH_TOKEN != '' }}
         run: |
           gh issue create \
             --repo LibruaryNFT/command-center \
