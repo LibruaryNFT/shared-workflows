@@ -8,24 +8,25 @@ on:
         required: true
         type: string
     secrets:
-      CC_PAT:
-        description: 'PAT with issues:write on command-center repo'
-        required: false
       DISCORD_WEBHOOK:
         description: 'Discord webhook URL for notifications'
         required: false
 
+permissions:
+  issues: write
+
 jobs:
   notify:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
-      - name: Create issue in command-center
+      - name: Create issue on calling repo
         env:
-          GH_TOKEN: ${{ secrets.CC_PAT }}
-        if: ${{ env.GH_TOKEN != '' }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh issue create \
-            --repo LibruaryNFT/command-center \
+            --repo ${{ github.repository }} \
             --title "[CI-FAIL] ${{ inputs.project }} — ${{ github.workflow }} failed" \
             --label "ci-failure" \
             --body "$(cat <<BODY
