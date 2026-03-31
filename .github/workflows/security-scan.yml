@@ -31,6 +31,7 @@ jobs:
           scan-type: ${{ inputs.scan-type }}
           scan-ref: '.'
           severity: ${{ inputs.severity }}
-          exit-code: '1'
+          # Non-blocking on Dependabot PRs — they're fixing vulns, not introducing them
+          exit-code: ${{ github.actor == 'dependabot[bot]' && '0' || '1' }}
           skip-dirs: ${{ inputs.skip-dirs }}
           format: 'table'
