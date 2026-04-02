@@ -12,12 +12,11 @@ on:
         description: 'Discord webhook URL for notifications'
         required: false
 
-permissions:
-  issues: write
-
 jobs:
   notify:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
       - name: Create issue on calling repo
         env:
