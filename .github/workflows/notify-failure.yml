@@ -7,10 +7,6 @@ on:
         description: 'Project name for the issue title'
         required: true
         type: string
-    secrets:
-      DISCORD_WEBHOOK:
-        description: 'Discord webhook URL for notifications'
-        required: false
 
 jobs:
   notify:
@@ -41,11 +37,3 @@ jobs:
           BODY
           )"
 
-      - name: Discord notification
-        env:
-          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
-        if: ${{ env.WEBHOOK_URL != '' }}
-        run: |
-          curl -s -H "Content-Type: application/json" \
-            -d "{\"content\": \"🔴 **CI Failed**: ${{ inputs.project }} — ${{ github.workflow }}\\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
-            "$WEBHOOK_URL"
